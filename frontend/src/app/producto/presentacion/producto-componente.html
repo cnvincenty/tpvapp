@@ -1,0 +1,117 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/"><i class="bi bi-speedometer"></i> Inicio</a></li>
+    <li class="breadcrumb-item active" aria-current="page"><i class="bi bi-box-seam"></i> Producto</li>
+  </ol>
+</nav>
+
+<div class="container py-4">
+  <h2>Gestión de Productos</h2>
+
+  <button class="btn btn-primary mb-3" (click)="abrirNuevo()">
+    <i class="bi bi-plus-lg"></i> Nuevo Producto
+  </button>
+
+  <table class="table table-bordered table-hover">
+    <thead class="table-light">
+      <tr>
+        <th class="text-center">ID</th>
+        <th class="text-center">Codigo</th>
+        <th class="text-center">Nombre</th>
+        <th class="text-center">Unidad de Medida</th>
+        <th class="text-center">Precio Unitario</th>
+        <th class="text-center">Imagen referencial</th>
+        <th class="text-center">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let g of datos">
+        <td class="align-middle text-center">{{ g.id }}</td>
+        <td class="align-middle text-left">{{ g.codigo }}</td>
+        <td class="align-middle text-left">{{ g.nombre }}</td>
+        <td class="align-middle text-left">{{ g.unidadMedida }}</td>
+        <td class="align-middle text-end"><h2>{{ g.preciounitario | number:'1.2-2'}}</h2></td>
+        <td class="align-middle text-center">
+          <img
+              [src]="rutaImagen+g.ruta"
+              class="img-thumbnail"
+              width="150px"
+              height="150px"
+          />
+        </td>
+        <td class="text-center">
+          <button class="btn btn-sm btn-warning me-2" (click)="editar(g)">
+            <i class="bi bi-pencil-square"></i> Editar
+          </button>
+          <button class="btn btn-sm btn-danger" (click)="eliminar(g.id!)">
+            <i class="bi bi-trash"></i> Eliminar
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Modal -->
+  <div class="modal fade" id="ventanaModal" tabindex="-1" aria-labelledby="ventanaModalLabel" aria-hidden="true" #ventanaModal>
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <form (ngSubmit)="guardar()" #productoForm="ngForm">
+          <div class="modal-header">
+            <h5 class="modal-title" id="ventanaModalLabel">
+              {{ editando ? 'Editar Producto' : 'Nuevo Producto' }}
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="reset()"></button>
+          </div>
+          <div class="modal-body row g-3">
+
+            <div class="col-md-2">
+              <label for="codigo" class="form-label">Codigo</label>
+              <input type="text" class="form-control" id="codigo" name="codigo" [(ngModel)]="dato.codigo" required />
+            </div>
+
+            <div class="col-md-6">
+              <label for="nombre" class="form-label">Nombre</label>
+              <input type="text" class="form-control" id="nombre" name="nombre" [(ngModel)]="dato.nombre" required />
+            </div>
+
+            <div class="col-md-4">
+              <label for="preciounitario" class="form-label">Precio Unitario</label>
+              <input type="text" class="form-control" id="preciounitario" name="preciounitario" [(ngModel)]="dato.preciounitario" required />
+            </div>
+
+            <div class="col-md-6">
+              <label for="unidadMedida" class="form-label">Unidad de Medida</label>
+              <input type="text" class="form-control" id="unidadMedida" name="unidadMedida" [(ngModel)]="dato.unidadMedida" required />
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Grupo Productos</label>
+              <select class="form-select" [(ngModel)]="dato.grupoproductoId" name="grupoproductoId" required>
+                <option [ngValue]="null">Seleccione...</option>
+                <option *ngFor="let gp of gruposproductos" [ngValue]="gp.id">{{ gp.nombre }}</option>
+              </select>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Vista Previa</label>
+              <p class="text-center align-middle">
+                <img [src]="rutaImagen+dato.ruta" class="img-thumbnail" width="150px" height="150px"/>
+              </p>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Carga imagen</label>
+              <input type="file" class="form-control" (change)="fseleccionarArchivo($event)" />
+              <hr>
+              <img [src]="imagenSrc" *ngIf="imagenSrc" class="img-fluid mx-auto d-block" height="150px" width="150px" />
+            </div>
+
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="reset()">Cancelar</button>
+            <button type="submit" class="btn btn-primary">{{ editando ? 'Actualizar' : 'Guardar' }}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

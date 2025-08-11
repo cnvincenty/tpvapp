@@ -1,0 +1,110 @@
+<br>
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/"><i class="bi bi-speedometer"></i> Inicio</a></li>
+        <li class="breadcrumb-item active" aria-current="page"><i class="bi bi-box-boxes"></i> Grupo cliente</li>
+    </ol>
+</nav>
+
+<div class="container py-4">
+  <h2>Gestión de Grupos clientes</h2>
+
+  <button
+    class="btn btn-primary mb-3"
+    (click)="abrirNuevo()">
+    <i class="bi bi-plus-lg"></i>Nuevo Grupo cliente
+  </button>
+
+  <table class="table table-bordered table-hover">
+    <thead class="table-light">
+      <tr>
+        <th class="text-center">ID</th>
+        <th class="text-center">Nombre</th>
+        <th class="text-center">Descuento</th>
+        <th class="text-center">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let _i of datos">
+        <td class="text-center">{{ _i.id }}</td>
+        <td class="text-start">{{ _i.nombre }}</td>
+        <td class="text-end">{{ _i.descuento | number:'1.2-2'}}</td>
+        <td class="text-center">
+          <button
+            class="btn btn-sm btn-warning me-2"
+            (click)="editar(_i)">
+            <i class="bi bi-pencil-square"></i> Editar
+          </button>
+          <button class="btn btn-sm btn-danger" (click)="eliminar(_i.id!)">
+            <i class="bi bi-trash"></i> Eliminar
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div
+    class="modal fade"
+    id="ventanaModal"
+    tabindex="-1"
+    aria-labelledby="ventanaModalLabel"
+    aria-hidden="true"
+    #ventanaModal
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form (ngSubmit)="guardar()" #grupoForm="ngForm">
+          <div class="modal-header">
+            <h5 class="modal-title" id="grupoModalLabel">
+              {{ editando ? 'Editar Grupo cliente' : 'Nuevo Grupo cliente' }}
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+              (click)="reset()"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="nombre" class="form-label">Nombre</label>
+              <input
+                type="text"
+                class="form-control"
+                id="nombre"
+                name="nombre"
+                [(ngModel)]="dato.nombre"
+                required
+              />
+            </div>
+            <div class="mb-3">
+              <label for="descuento" class="form-label">Descuento</label>
+              <input
+                type="number"
+                class="form-control"
+                id="descuento"
+                name="descuento"
+                [(ngModel)]="dato.descuento"
+                required
+              />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+              (click)="reset()"
+            >
+              Cancelar
+            </button>
+            <button type="submit" class="btn btn-primary">
+              {{ editando ? 'Actualizar' : 'Guardar' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

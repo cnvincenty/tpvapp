@@ -1,0 +1,18 @@
+form {
+  margin-bottom: 1rem;
+  input {
+    margin-right: 0.5rem;
+  }
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  th, td {
+    border: 1px solid #ccc;
+    padding: 0.5rem;
+  }
+  th {
+    background-color: #f0f0f0;
+  }
+}

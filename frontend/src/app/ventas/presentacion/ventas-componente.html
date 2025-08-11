@@ -1,0 +1,130 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a href="/"><i class="bi bi-speedometer"></i> Inicio</a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">
+      <i class="bi bi-cart"></i> Ventas
+    </li>
+  </ol>
+</nav>
+
+<div class="container py-4">
+  <div class="row">
+    <div class="col-md-4">
+      <h4>Grupos de Productos</h4>
+      <select class="form-select mb-3" [(ngModel)]="grupoSeleccionado" (change)="cargarProductosPorGrupo()">
+        <option [ngValue]="null">Seleccione un grupo</option>
+        <option *ngFor="let gp of gruposproductos" [ngValue]="gp.id">{{ gp.nombre }}</option>
+      </select>
+
+      <div *ngFor="let producto of productosPorGrupo" class="card mb-2">
+        <div class="row g-0">
+          <div class="col-4">
+            <img [src]="rutaImagen + producto.ruta" class="img-fluid rounded-start" alt="Imagen del producto" />
+          </div>
+          <div class="col-8">
+            <div class="card-body">
+              <h5 class="card-title">{{ producto.nombre }}</h5>
+              <p class="card-text">Unidad: {{ producto.unidadMedida }}</p>
+              <p class="card-text">
+                <strong>Precio: </strong> Bs {{ producto.preciounitario | number:'1.2-2' }}
+              </p>
+              <button class="btn btn-sm btn-primary" (click)="agregarProducto(producto)">
+                <i class="bi bi-cart-plus"></i> Agregar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-8">
+      <h4>Buscar Cliente (Codigo)</h4>
+      <div class="input-group mb-3">
+        <input type="text" class="form-control" placeholder="Ingrese Codigo" [(ngModel)]="codigoBusqueda" />
+        <button class="btn btn-outline-secondary" type="button" (click)="buscarCliente()">
+          <i class="bi bi-search"></i> Buscar
+        </button>
+      </div>
+      <div *ngIf="clienteEncontrado" class="alert alert-success">
+        <h5>Cliente encontrado:</h5>
+        <p><strong>Nombre:</strong> {{ clienteEncontrado.nombre }}</p>
+        <p><strong>CI:</strong> {{ clienteEncontrado.dip }}</p>
+      </div>
+
+      <div *ngIf="clienteEncontrado === null && codigoBusqueda">
+        <div class="alert alert-danger">
+          Cliente no encontrado.
+        </div>
+      </div>
+
+      <h4>Almacén</h4>
+      <div class="mb-3">
+        <input type="text" class="form-control" [value]="'Almacén Central'" readonly />
+      </div>
+
+      <h4>Condición de Pago</h4>
+      <div class="mb-3">
+        <select class="form-select" [(ngModel)]="condicionPago">
+          <option [ngValue]="null">Seleccione una condición</option>
+          <option value="EFECTIVO">Efectivo</option>
+          <option value="CREDITO">Crédito</option>
+        </select>
+      </div>
+      <h4>Productos Seleccionados</h4>
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th>Precio Unitario</th>
+            <th>Total</th>
+            <th>Eliminar</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of productosSeleccionados; let i = index">
+            <td>{{ item.producto.nombre }}</td>
+            <td>
+              <input type="number" class="form-control form-control-sm" min="1" [(ngModel)]="item.cantidad" />
+            </td>
+            <td class="text-end">{{ item.producto.preciounitario | number:'1.2-2' }}</td>
+            <td class="text-end">{{ (item.cantidad * item.producto.preciounitario) | number:'1.2-2' }}</td>
+            <td class="text-center">
+              <button class="btn btn-sm btn-danger" (click)="eliminarProducto(i)">
+                <i class="bi bi-trash"></i>
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="productosSeleccionados.length === 0">
+            <td colspan="5" class="text-center">No hay productos seleccionados.</td>
+          </tr>
+        </tbody>
+        <tfoot *ngIf="productosSeleccionados.length > 0">
+          <tr>
+            <th colspan="3" class="text-end">Total:</th>
+            <th class="text-end">{{ total | number:'1.2-2' }}</th>
+            <th></th>
+          </tr>
+          <tr>
+            <th colspan="3" class="text-end">Descuento:</th>
+            <th class="text-end text-danger">- {{ descuentoTotal | number:'1.2-2' }}</th>
+            <th></th>
+          </tr>
+          <tr>
+            <th colspan="3" class="text-end">Total a pagar:</th>
+            <th class="text-end text-success">{{ totalAPagar | number:'1.2-2' }}</th>
+            <th></th>
+          </tr>
+        </tfoot>
+      </table>
+      <div class="d-grid gap-2 col-6 mx-auto">
+        <button class="btn btn-success btn-block"
+          [disabled]="productosSeleccionados.length === 0 || !clienteEncontrado || !condicionPago" (click)="pagar()">
+          <i class="bi bi-cash-stack"></i> Pagar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

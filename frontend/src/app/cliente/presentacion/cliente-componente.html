@@ -1,0 +1,158 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/"><i class="bi bi-speedometer"></i> Inicio</a></li>
+    <li class="breadcrumb-item active" aria-current="page"><i class="bi bi-box-seam"></i> Cliente</li>
+  </ol>
+</nav>
+
+<div class="container py-4">
+  <h2>Gestión de Clientes</h2>
+
+  <button class="btn btn-primary mb-3" (click)="abrirNuevo()">
+    <i class="bi bi-plus-lg"></i> Nuevo Cliente
+  </button>
+
+  <table class="table table-bordered table-hover">
+    <thead class="table-light">
+      <tr>
+        <th class="text-center">ID</th>
+        <th class="text-center">Nombre</th>
+        <th class="text-center">Documento</th>
+        <th class="text-center">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let g of datos">
+        <td class="text-center">{{ g.id }}</td>
+        <td class="text-left">{{ g.nombre }}</td>
+        <td class="text-left">{{ g.numeroDocumento }}</td>
+        <td class="text-center">
+          <button class="btn btn-sm btn-warning me-2" (click)="editar(g)">
+            <i class="bi bi-pencil-square"></i> Editar
+          </button>
+          <button class="btn btn-sm btn-danger" (click)="eliminar(g.id!)">
+            <i class="bi bi-trash"></i> Eliminar
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Modal -->
+  <div class="modal fade" id="ventanaModal" tabindex="-1" aria-labelledby="ventanaModalLabel" aria-hidden="true"
+    #ventanaModal>
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <form #clienteForm="ngForm" (ngSubmit)="guardar()" novalidate>
+
+          <div class="modal-header">
+            <h5 class="modal-title" id="ventanaModalLabel">
+              {{ editando ? 'Editar Cliente' : 'Nuevo Cliente' }}
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+              (click)="reset()"></button>
+          </div>
+          <div class="modal-body row g-3">
+
+            <div class="col-md-6">
+              <label for="codigo" class="form-label">Código</label>
+              <input type="text" class="form-control" id="codigo" name="codigo" [(ngModel)]="dato.codigo" required
+                #codigo="ngModel" [ngClass]="{
+      'is-invalid': codigo.invalid && (codigo.touched || clienteForm.submitted),
+      'is-valid': codigo.valid && codigo.touched
+    }" />
+              <div class="invalid-feedback" *ngIf="codigo.invalid && (codigo.touched || clienteForm.submitted)">
+                Código es obligatorio.
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label for="nombre" class="form-label">Nombre</label>
+              <input type="text" class="form-control" id="nombre" name="nombre" [(ngModel)]="dato.nombre" required
+                #nombre="ngModel" [ngClass]="{
+      'is-invalid': nombre.invalid && (nombre.touched || clienteForm.submitted),
+      'is-valid': nombre.valid && nombre.touched
+    }" />
+              <div class="invalid-feedback" *ngIf="nombre.invalid && (nombre.touched || clienteForm.submitted)">
+                Nombre es obligatorio.
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label for="tipoDocumento" class="form-label">Tipo de Documento</label>
+              <select class="form-select" id="tipoDocumento" name="tipoDocumento" [(ngModel)]="dato.tipoDocumento"
+                required #tipoDocumento="ngModel" [ngClass]="{
+      'is-invalid': tipoDocumento.invalid && (tipoDocumento.touched || clienteForm.submitted),
+      'is-valid': tipoDocumento.valid && tipoDocumento.touched
+    }">
+                <option [ngValue]="null">Seleccione...</option>
+                <option *ngFor="let tipo of tipoDocumentos" [value]="tipo.codigo">{{ tipo.descripcion }}</option>
+              </select>
+              <div class="invalid-feedback"
+                *ngIf="tipoDocumento.invalid && (tipoDocumento.touched || clienteForm.submitted)">
+                Tipo de documento es obligatorio.
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label for="numeroDocumento" class="form-label">Número de Documento</label>
+              <input type="text" class="form-control" id="numeroDocumento" name="numeroDocumento"
+                [(ngModel)]="dato.numeroDocumento" required pattern="^[0-9]*$" #numeroDocumento="ngModel" [ngClass]="{
+      'is-invalid': numeroDocumento.invalid && (numeroDocumento.touched || clienteForm.submitted),
+      'is-valid': numeroDocumento.valid && numeroDocumento.touched
+    }" />
+              <div class="invalid-feedback"
+                *ngIf="numeroDocumento.errors?.['required'] && (numeroDocumento.touched || clienteForm.submitted)">
+                Número de documento es obligatorio.
+              </div>
+              <div class="invalid-feedback"
+                *ngIf="numeroDocumento.errors?.['pattern'] && (numeroDocumento.touched || clienteForm.submitted)">
+                Solo se permiten números.
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label for="email" class="form-label">Correo Electrónico</label>
+              <input type="email" class="form-control" id="email" name="email" [(ngModel)]="dato.email" required
+                pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" #email="ngModel" [ngClass]="{
+    'is-invalid': email.invalid && (email.touched || clienteForm.submitted),
+    'is-valid': email.valid && email.touched
+  }" />
+              <div class="invalid-feedback"
+                *ngIf="email.errors?.['required'] && (email.touched || clienteForm.submitted)">
+                Correo electrónico es obligatorio.
+              </div>
+              <div class="invalid-feedback"
+                *ngIf="(email.errors?.['pattern'] || email.errors?.['email']) && (email.touched || clienteForm.submitted)">
+                Formato de correo no válido. Debe incluir "(arroba)" y un dominio con punto
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Grupo Cliente</label>
+              <select class="form-select" [(ngModel)]="dato.grupoclienteId" name="grupoclienteId" required
+                #grupoclienteId="ngModel" [ngClass]="{
+      'is-invalid': grupoclienteId.invalid && (grupoclienteId.touched || clienteForm.submitted),
+      'is-valid': grupoclienteId.valid && grupoclienteId.touched
+    }">
+                <option [ngValue]="null">Seleccione...</option>
+                <option *ngFor="let gc of gruposclientes" [ngValue]="gc.id">{{ gc.nombre }}</option>
+              </select>
+              <div class="invalid-feedback"
+                *ngIf="grupoclienteId.invalid && (grupoclienteId.touched || clienteForm.submitted)">
+                Debe seleccionar un grupo de cliente.
+              </div>
+            </div>
+
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="reset()">Cancelar</button>
+            <button type="submit" class="btn btn-primary" [disabled]="clienteForm.invalid">
+              {{ editando ? 'Actualizar' : 'Guardar' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

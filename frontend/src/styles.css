@@ -1,0 +1,48 @@
+:root {
+  --bs-primary: #1d3557;
+  --bs-secondary: #f57900;
+}
+
+.bg-primary {
+  background-color: #1d3557 !important;
+}
+
+.bg-secondary {
+  background-color: #f57900 !important;
+}
+
+.text-primary {
+  color: #1d3557 !important;
+}
+
+.text-secondary {
+  color: #f57900 !important;
+}
+
+.btn-primary {
+  background-color: #1d3557 !important;
+  border-color: #1d3557 !important;
+  color: white !important;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+  background-color: #163a57 !important;
+  border-color: #163a57 !important;
+  color: white !important;
+}
+
+.btn-secondary {
+  background-color: #f57900 !important;
+  border-color: #f57900 !important;
+  color: white !important;
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus,
+.btn-secondary:active {
+  background-color: #d46c00 !important;
+  border-color: #d46c00 !important;
+  color: white !important;
+}
