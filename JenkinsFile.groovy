@@ -35,7 +35,7 @@ pipeline {
                 script {
                     def targetDir = "${env.WORKSPACE}\\${env.BACKEND_DIR}\\target"
                     def result = bat(
-                        script: "dir /B \"${targetDir}\\tpvapp.jar\"",
+                        script: 'dir /B "${targetDir}\\tpvapp.jar"',
                         returnStdout: true
                     ).trim()
                     if (!result) {
@@ -53,7 +53,7 @@ pipeline {
                 script {
                     def despliegueDir = "${env.DESPLIEGUE_DIR}\\backend"
                     bat 'if not exist "${despliegueDir}" mkdir "${despliegueDir}"'
-                    bat 'copy /Y "${env.JAR_PATH}" "${despliegueDir}\\app.jar"'
+                    bat 'copy /Y "${env.JAR_PATH}" "${despliegueDir}"\\app.jar"'
                     println "Backend Desplegado en ${despliegueDir}\\app.jar ..."
                 }
             }
