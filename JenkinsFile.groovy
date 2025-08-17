@@ -55,11 +55,8 @@ pipeline {
             steps {
                 script {
                     def despliegueDir = "${env.DESPLIEGUE_DIR}\\backend"
-                    new File(despliegueDir).mkdirs()
-                    def destino = new File("${despliegueDir}\\app.jar")
-                    new File(env.JAR_PATH).withInputStream {
-                        input -> destino.withOutputStream { output -> output << input }
-                    }
+                    bat 'if not exist "${despliegueDir}" mkdir "${despliegueDir}"'
+                    bat 'copy /Y "${env.JAR_PATH}" "${despliegueDir}\\app.jar"'
                     println "Backend Desplegado en ${despliegueDir}\\app.jar ..."
                 }
             }
