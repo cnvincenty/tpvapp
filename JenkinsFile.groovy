@@ -1,12 +1,11 @@
 pipeline {
-
     agent any
 
     environment {
-        BACKEND_DIR   = "backend"
-        FRONTEND_DIR  = "frontend"
+        BACKEND_DIR    = "backend"
+        FRONTEND_DIR   = "frontend"
         DESPLIEGUE_DIR = "c:\\despliegue"
-        NSSM_PATH     = "c:\\nssm\\nssm.exe"
+        NSSM_PATH      = "c:\\nssm\\nssm.exe"
     }
 
     options {
@@ -15,35 +14,39 @@ pipeline {
 
     stages {
         stage('Descargar de GITHUB') {
-            steps{
-                git(url:'https://github.com/cnvincenty/tpvapp.git',branch:'main')
+            steps {
+                git(url:'https://github.com/cnvincenty/tpvapp.git', branch:'main')
                 echo "Código descargado de GitHub ..."
             }
         }
 
         stage('Compilar Backend') {
-            steps{
+            steps {
                 dir("${env.BACKEND_DIR}") {
-                    bat 'mvn clean install -DskipTests'
+                    powershell 'mvn clean install -DskipTests'
                 }
                 echo "Backend compilado ..."
             }
         }
 
         stage('Construir Backend') {
-            steps{
+            steps {
                 script {
                     def targetDir = "${env.WORKSPACE}\\${env.BACKEND_DIR}\\target"
-                    def result = bat(
-                        script: 'dir /B "${targetDir}\\tpvapp.jar"',
+
+                    def jarFile = powershell(
+                        script: "Get-ChildItem -Path '${targetDir}' -Filter '*.jar' | Where-Object { \$_.Name -notlike '*.original*' } | Select-Object -First 1 -ExpandProperty Name",
                         returnStdout: true
                     ).trim()
-                    if (!result) {
-                        error "No se encontró el tpvapp.jar en ${targetDir}"
+
+                    if (!jarFile) {
+                        error "No se encontró un JAR válido en ${targetDir}"
                     }
-                    env.JAR_PATH = "${targetDir}\\${result}"
-                    env.JAR_NAME = result
-                    println "Backend construido: ${env.JAR_NAME} ..."
+
+                    env.JAR_PATH = "${targetDir}\\${jarFile}"
+                    env.JAR_NAME = jarFile
+
+                    echo "Backend construido: ${env.JAR_NAME} ..."
                 }
             }
         }
@@ -52,9 +55,13 @@ pipeline {
             steps {
                 script {
                     def despliegueDir = "${env.DESPLIEGUE_DIR}\\backend"
-                    bat 'if not exist "${despliegueDir}" mkdir "${despliegueDir}"'
-                    bat 'copy /Y "${env.JAR_PATH}" "${despliegueDir}"\\app.jar"'
-                    println "Backend Desplegado en ${despliegueDir}\\app.jar ..."
+
+                    powershell """
+                        if (-not (Test-Path '${despliegueDir}')) { New-Item -ItemType Directory -Path '${despliegueDir}' | Out-Null }
+                        Copy-Item -Path '${env.JAR_PATH}' -Destination '${despliegueDir}\\app.jar' -Force
+                    """
+
+                    echo "Backend desplegado en ${despliegueDir}\\app.jar ..."
                 }
             }
         }
@@ -66,32 +73,25 @@ pipeline {
                     def jarPath = "${env.DESPLIEGUE_DIR}\\backend\\app.jar"
                     def nssmPath = env.NSSM_PATH
 
-                    def run = { cmd ->
-                        def proc = new ProcessBuilder(cmd)
-                            .redirectErrorStream(true)
-                            .start()
-                        proc.inputStream.eachLine { println it }
-                        proc.waitFor()
-                        return proc.exitValue()
-                    }
-
-                    def existe = run(["powershell", "-Command", "Get-Service $servicioName -ErrorAction SilentlyContinue"]) == 0
-
+                    def existe = powershell(
+                        script: "if (Get-Service -Name '${servicioName}' -ErrorAction SilentlyContinue) { exit 0 } else { exit 1 }",
+                        returnStatus: true
+                    ) == 0
 
                     if (!existe) {
-                        println "Servicio $servicioName no existe. Instalando..."
-                        run([nssmPath, "install", servicioName, "java", "-jar", jarPath])
-                        run([nssmPath, "set", servicioName, "Start", "SERVICE_AUTO_START"])
-                        println "Servicio $servicioName creado e instalado"
+                        echo "Instalando servicio ${servicioName} ..."
+                        powershell "& '${nssmPath}' install '${servicioName}' java -jar '${jarPath}'"
+                        powershell "& '${nssmPath}' set '${servicioName}' Start SERVICE_AUTO_START"
+                        echo "Servicio ${servicioName} creado e instalado"
                     } else {
-                        println "Servicio $servicioName existe. Deteniendo..."
-                        run([nssmPath, "stop", servicioName])
+                        echo "Reiniciando servicio ${servicioName} ..."
+                        powershell "& '${nssmPath}' stop '${servicioName}'"
                         sleep 5
                     }
 
-                    println "Iniciando servicio $servicioName..."
-                    run([nssmPath, "start", servicioName])
-                    println "Servicio $servicioName iniciado"
+                    echo "Iniciando servicio ${servicioName} ..."
+                    powershell "& '${nssmPath}' start '${servicioName}'"
+                    echo "Servicio ${servicioName} iniciado"
                 }
             }
         }
@@ -99,11 +99,10 @@ pipeline {
 
     post {
         always {
-            echo 'Proceso de despliegue del backend y frontend completado.'
+            echo 'Proceso de despliegue completado.'
         }
         failure {
             echo 'El despliegue falló, revisa los logs para más detalles.'
         }
     }
-
 }
