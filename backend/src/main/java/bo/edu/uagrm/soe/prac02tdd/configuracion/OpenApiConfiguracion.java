@@ -13,8 +13,8 @@ public class OpenApiConfiguracion {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("Practica 02 TDD API")
-                        .version("1.0")
-                        .description("API para gestión de ventas aplicando TDD"));
+                        .title("TPV APP")
+                        .version("1.0.0")
+                        .description("API para gestión de ventas TPV APP"));
     }
 }

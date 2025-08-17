@@ -85,6 +85,7 @@
 	</dependencies>
 
 	<build>
+		<finalName>tpvapp</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

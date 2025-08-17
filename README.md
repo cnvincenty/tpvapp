@@ -49,15 +49,30 @@ frontend/ # Frontend Angular 20
 
 ---
 
+### Requisito previo
+Crear un carpeta recursos
+
+c:\despliegue\backend\recursos
+
+### Base de Datos credenciales
+
+Usuario: tpvappusuario
+Clave: Cl4v3S3cR3t4
+Puerto: 3306
+Host: localhost
+Base: tpvapp
+
 ### Backend – Variables de Entorno
 
 Editar backend/src/main/resources/application.properties:
 
 ```
+server.port=9595
+
 spring.datasource.hikari.driver-class-name=com.mysql.cj.jdbc.Driver
 spring.datasource.url=jdbc:mysql://localhost:3306/tpvapp?createDatabaseIfNotExist=true
-spring.datasource.username=root
-spring.datasource.password=123qwe
+spring.datasource.username=tpvappusuario
+spring.datasource.password=Cl4v3S3cR3t4
 ```
 
 ### Frontend – Configuración de API
@@ -67,7 +82,7 @@ En frontend/src/environments/environment.prod.ts:
 ```
 export const environment = {
   production: true,
-  apiUrl: 'http://<backend-host>:8080'
+  apiUrl: 'http://<backend-host>:9595'
 };
 ```
 
