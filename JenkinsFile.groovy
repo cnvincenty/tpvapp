@@ -34,18 +34,15 @@ pipeline {
             steps{
                 script {
                     def targetDir = "${env.WORKSPACE}\\${env.BACKEND_DIR}\\target"
-
-                    def jarFile = new File(targetDir).listFiles().find {
-                        it.name.endsWith("tpvapp.jar")
-                    }
-
-                    if (!jarFile) {
+                    def result = bat(
+                        script: "dir /B \"${targetDir}\\tpvapp.jar\"",
+                        returnStdout: true
+                    ).trim()
+                    if (!result) {
                         error "No se encontró el tpvapp.jar en ${targetDir}"
                     }
-
-                    env.JAR_PATH = jarFile.absolutePath
-                    env.JAR_NAME = jarFile.name
-
+                    env.JAR_PATH = "${targetDir}\\${result}"
+                    env.JAR_NAME = result
                     println "Backend construido: ${env.JAR_NAME} ..."
                 }
             }
