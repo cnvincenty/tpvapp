@@ -24,7 +24,7 @@ pipeline {
         stage('Compilar Backend') {
             steps{
                 dir("${env.BACKEND_DIR}") {
-                    bat mvn clean install -DskipTests
+                    bat 'mvn clean install -DskipTests'
                 }
                 echo "Backend compilado ..."
             }
