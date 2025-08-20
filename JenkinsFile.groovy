@@ -6,6 +6,7 @@ pipeline {
         FRONTEND_DIR   = "frontend"
         DESPLIEGUE_DIR = "c:\\despliegue"
         NSSM_PATH      = "c:\\nssm\\nssm.exe"
+        WEB_DIR        = "C:\\nginx\\html\\tpvapp"
     }
 
     options {
@@ -93,6 +94,47 @@ pipeline {
                     powershell "& '${nssmPath}' start '${servicioName}'"
                     echo "Servicio ${servicioName} iniciado"
                 }
+            }
+        }
+
+        stage('Compilar Frontend') {
+            steps {
+                dir("${env.FRONTEND_DIR}") {
+                    powershell 'npm install && npm run build'
+                }
+                echo "Backend compilado ..."
+            }
+        }
+
+        stage('Limpiar') {
+            steps {
+                powershell(returnStdout:true, script:'Remove-Item -Path "C:\\nginx\\html\\tpvapp\\*" -Include *.* -Force');
+                println('Limpieza');
+            }
+        }
+
+        stage('Parar servicio nginx') {
+            steps {
+                powershell(returnStdout:true, script:'net stop nginx');
+                println('Parar servicio');
+            }
+        }
+
+        stage('Despliegue de archivos') {
+            steps {
+                script {
+                        String command = "Copy-Item -Path " + "${WORKSPACE}" + "\\Dist\\* -Destination 'C:\\nginx\\html\\sys-frontend\\' -Recurse -Force";
+                        println(command);
+                        powershell(returnStdout:true, script:command);
+                        println('Clean-Up done.');
+                }
+            }
+        }
+
+        stage('Levantar servicio nginx') {
+            steps {
+                powershell(returnStdout:true, script:'net start nginx');
+                println('Levantar servicio');
             }
         }
     }
