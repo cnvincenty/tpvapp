@@ -1,37 +1,58 @@
 <header>
   <nav class="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
     <div class="container-fluid">
-      <a class="navbar-brand" href="/">
+      <a class="navbar-brand" routerLink="/">
         <img src="imagenes/logo.png" alt="Bootstrap" width="30" height="24"> TPV App
       </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+              data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+              aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="/" ><i class="bi bi-speedometer"></i> Inicio</a>
+            <a class="nav-link active" aria-current="page" routerLink="/">
+              <i class="bi bi-speedometer"></i> Inicio
+            </a>
           </li>
+
           <li class="nav-item">
-            <a class="nav-link" aria-current="page" href="/grupoproducto"><i class="bi bi-boxes"></i> Grupos Productos</a>
+            <a class="nav-link" routerLink="/grupoproducto">
+              <i class="bi bi-boxes"></i> Grupos Productos
+            </a>
           </li>
+
           <li class="nav-item">
-            <a class="nav-link" aria-current="page" href="/producto"><i class="bi bi-box-seam"></i> Productos</a>
+            <a class="nav-link" routerLink="/producto">
+              <i class="bi bi-box-seam"></i> Productos
+            </a>
           </li>
+
           <li class="nav-item">
-            <a class="nav-link" aria-current="page" href="/grupocliente"><i class="bi bi-people"></i> Grupo Clientes</a>
+            <a class="nav-link" routerLink="/grupocliente">
+              <i class="bi bi-people"></i> Grupo Clientes
+            </a>
           </li>
+
           <li class="nav-item">
-            <a class="nav-link" aria-current="page" href="/cliente"><i class="bi bi-person"></i> Clientes</a>
+            <a class="nav-link" routerLink="/cliente">
+              <i class="bi bi-person"></i> Clientes
+            </a>
           </li>
+
           <li class="nav-item">
-            <a class="nav-link" aria-current="page" href="/venta"><i class="bi bi-cart"></i> Ventas</a>
+            <a class="nav-link" routerLink="/venta">
+              <i class="bi bi-cart"></i> Ventas
+            </a>
           </li>
+
         </ul>
       </div>
     </div>
   </nav>
 </header>
 <div class="container">
-  <router-outlet />
+  <router-outlet></router-outlet>
 </div>

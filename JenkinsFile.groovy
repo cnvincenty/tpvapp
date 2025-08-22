@@ -124,7 +124,7 @@ pipeline {
         stage('Parar servicio nginx') {
             steps {
                 script {
-                    powershell "& '${env.NSSM_PATH}' stop 'nginx.exe'"
+                    powershell "& '${env.NSSM_PATH}' stop 'nginx'"
                     println('Parar servicio ...');
                 }
             }
@@ -144,7 +144,7 @@ pipeline {
         stage('Levantar servicio nginx') {
             steps {
                 script {
-                    powershell "& '${env.NSSM_PATH}' start 'nginx.exe'"
+                    powershell "& '${env.NSSM_PATH}' start 'nginx'"
                     println('Levantar servicio ...');
                 }
             }
