@@ -133,7 +133,7 @@ pipeline {
         stage('Despliegue de archivos') {
             steps {
                 script {
-                    String command = "Copy-Item -Path " + "${WORKSPACE}" + "\\frontend\\dist\\* -Destination 'C:\\nginx\\html\\tpvapp\\' -Recurse -Force";
+                    String command = "Copy-Item -Path " + "${WORKSPACE}" + "\\frontend\\dist\\partevisual\\browser\\* -Destination 'C:\\nginx\\html\\tpvapp\\' -Recurse -Force";
                     println(command);
                     powershell(returnStdout:true, script:command);
                     println('Despliegue realizado ...');
