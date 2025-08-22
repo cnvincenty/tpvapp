@@ -124,8 +124,7 @@ pipeline {
         stage('Parar servicio nginx') {
             steps {
                 script {
-                    def nssmPath = env.NSSM_PATH
-                    powershell "& '${nssmPath}' stop 'nginx.exe'"
+                    powershell "& '${env.NSSM_PATH}' stop 'nginx.exe'"
                     println('Parar servicio ...');
                 }
             }
@@ -145,8 +144,7 @@ pipeline {
         stage('Levantar servicio nginx') {
             steps {
                 script {
-                    def nssmPath = env.NSSM_PATH
-                    powershell "& '${nssmPath}' start 'nginx.exe'"
+                    powershell "& '${env.NSSM_PATH}' start 'nginx.exe'"
                     println('Levantar servicio ...');
                 }
             }
