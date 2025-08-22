@@ -123,8 +123,9 @@ pipeline {
 
         stage('Parar servicio nginx') {
             steps {
+                def nssmPath = env.NSSM_PATH
                 powershell "& '${nssmPath}' stop 'nginx.exe'"
-                println('Parar servicio');
+                println('Parar servicio ...');
             }
         }
 
@@ -134,15 +135,16 @@ pipeline {
                     String command = "Copy-Item -Path " + "${WORKSPACE}" + "\\Dist\\* -Destination 'C:\\nginx\\html\\tpvapp\\' -Recurse -Force";
                     println(command);
                     powershell(returnStdout:true, script:command);
-                    println('Clean-Up done.');
+                    println('Despliegue realizado ...');
                 }
             }
         }
 
         stage('Levantar servicio nginx') {
             steps {
+                def nssmPath = env.NSSM_PATH
                 powershell "& '${nssmPath}' start 'nginx.exe'"
-                println('Levantar servicio');
+                println('Levantar servicio ...');
             }
         }
     }
