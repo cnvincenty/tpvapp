@@ -6,7 +6,6 @@ pipeline {
         FRONTEND_DIR   = "frontend"
         DESPLIEGUE_DIR = "c:\\despliegue"
         NSSM_PATH      = "c:\\nssm\\nssm.exe"
-        WEB_DIR        = "C:\\nginx\\html\\tpvapp"
     }
 
     options {
@@ -100,9 +99,18 @@ pipeline {
         stage('Compilar Frontend') {
             steps {
                 dir("${env.FRONTEND_DIR}") {
-                    powershell 'npm install && npm run build'
+                    powershell 'npm install'
                 }
                 echo "Backend compilado ..."
+            }
+        }
+
+        stage('Construir Frontend') {
+            steps {
+                dir("${env.FRONTEND_DIR}") {
+                    powershell 'npm run build'
+                }
+                echo "Backend construido ..."
             }
         }
 
@@ -115,7 +123,7 @@ pipeline {
 
         stage('Parar servicio nginx') {
             steps {
-                powershell(returnStdout:true, script:'net stop nginx');
+                powershell(returnStdout:true, script:'nssm stop nginx.exe');
                 println('Parar servicio');
             }
         }
@@ -123,7 +131,7 @@ pipeline {
         stage('Despliegue de archivos') {
             steps {
                 script {
-                        String command = "Copy-Item -Path " + "${WORKSPACE}" + "\\Dist\\* -Destination 'C:\\nginx\\html\\sys-frontend\\' -Recurse -Force";
+                        String command = "Copy-Item -Path " + "${WORKSPACE}" + "\\Dist\\* -Destination 'C:\\nginx\\html\\tpvapp\\' -Recurse -Force";
                         println(command);
                         powershell(returnStdout:true, script:command);
                         println('Clean-Up done.');
@@ -133,7 +141,7 @@ pipeline {
 
         stage('Levantar servicio nginx') {
             steps {
-                powershell(returnStdout:true, script:'net start nginx');
+                powershell(returnStdout:true, script:'nssm start nginx.exe');
                 println('Levantar servicio');
             }
         }
