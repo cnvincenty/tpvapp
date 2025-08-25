@@ -3,7 +3,6 @@ pipeline {
 
     environment {
         BACKEND_DIR    = "backend"
-        FRONTEND_DIR   = "frontend"
         DESPLIEGUE_DIR = "c:\\despliegue"
         NSSM_PATH      = "c:\\nssm\\nssm.exe"
     }
@@ -18,38 +17,23 @@ pipeline {
                 stage('Despliegue Prueba') {
                     steps {
                         script {
-                            despliegueApp(
-                                "prueba",
-                                "tpv-backend-prueba",
-                                "tpvprueba",
-                                "9595"
-                            )
+                            despliegueApp("prueba","tpv-backend-prueba","tpvprueba","9595")
                         }
                     }
                 }
 
-                stage('Despliegue Preproducción') {
+                stage('Despliegue Preproduccion') {
                     steps {
                         script {
-                            despliegueApp(
-                                "preproduccion",
-                                "tpv-backend-preproduccion",
-                                "tpvapppre",
-                                "9696"
-                            )
+                            despliegueApp("preproduccion","tpv-backend-preproduccion","tpvapppre","9696")
                         }
                     }
                 }
 
-                stage('Despliegue Producción') {
+                stage('Despliegue Produccion') {
                     steps {
                         script {
-                            despliegueApp(
-                                "produccion",
-                                "tpv-backend-produccion",
-                                "tpvapp",
-                                "9797"
-                            )
+                            despliegueApp("produccion","tpv-backend-produccion","tpvapp","9797")
                         }
                     }
                 }
@@ -67,9 +51,6 @@ pipeline {
     }
 }
 
-/**
- * Función de despliegue parametrizada
- */
 def despliegueApp(branch, servicioBackend, carpetaFrontend, puertoBackend) {
     echo "=== Iniciando despliegue para ${branch} ==="
 
