@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         BACKEND_DIR    = "backend"
+        FRONTEND_DIR   = "frontend"
         DESPLIEGUE_DIR = "c:\\despliegue"
         NSSM_PATH      = "c:\\nssm\\nssm.exe"
     }
@@ -93,32 +94,38 @@ def despliegueApp(branch, servicioBackend, carpetaFrontend, puertoBackend) {
             def nssmPath = env.NSSM_PATH
 
             def existe = powershell(
-                script: "if (Get-Service -Name '${servicioBackend}' -ErrorAction SilentlyContinue) { exit 0 } else { exit 1 }",
+                script: "(Get-Service -Name '${servicioBackend}' -ErrorAction SilentlyContinue) -ne \$null",
                 returnStatus: true
             ) == 0
 
             if (!existe) {
                 echo "Instalando servicio ${servicioBackend} ..."
-                powershell "& '${nssmPath}' install '${servicioBackend}' java -jar '${jarPath}' --server.port=${puertoBackend}"
-                powershell "& '${nssmPath}' set '${servicioBackend}' Start SERVICE_AUTO_START"
+                powershell """
+                    & '${nssmPath}' install '${servicioBackend}' "java" " -jar '${jarPath}' --server.port=${puertoBackend}"
+                    & '${nssmPath}' set '${servicioBackend}' Start SERVICE_AUTO_START
+                """
             } else {
                 echo "Reiniciando servicio ${servicioBackend} ..."
                 powershell "& '${nssmPath}' stop '${servicioBackend}'"
-                sleep 5
+                // Espera más segura hasta que realmente se detenga
+                powershell """
+                    while ((Get-Service -Name '${servicioBackend}').Status -eq 'Running') { Start-Sleep -Seconds 2 }
+                """
             }
 
             powershell "& '${nssmPath}' start '${servicioBackend}'"
             echo "Servicio ${servicioBackend} iniciado en puerto ${puertoBackend}"
         }
 
+
         stage("Compilar Frontend ${branch}") {
-            dir("${branchDir}\\frontend") {
+            dir("${branchDir}\\${env.FRONTEND_DIR}") {
                 powershell 'npm install'
             }
         }
 
         stage("Construir Frontend ${branch}") {
-            dir("${branchDir}\\frontend") {
+            dir("${branchDir}\\${env.FRONTEND_DIR}") {
                 powershell 'npm run build'
             }
         }
@@ -135,7 +142,7 @@ def despliegueApp(branch, servicioBackend, carpetaFrontend, puertoBackend) {
         }
 
         stage("Despliegue Frontend ${branch}") {
-            def command = "Copy-Item -Path ${branchDir}\\frontend\\dist\\partevisual\\browser\\* -Destination C:\\nginx\\html\\${carpetaFrontend}\\ -Recurse -Force"
+            def command = "Copy-Item -Path ${branchDir}\\${env.FRONTEND_DIR}\\dist\\partevisual\\browser\\* -Destination C:\\nginx\\html\\${carpetaFrontend}\\ -Recurse -Force"
             powershell(returnStdout:true, script:command)
         }
 
