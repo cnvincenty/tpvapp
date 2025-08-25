@@ -107,15 +107,35 @@ def despliegueApp(branch, servicioBackend, carpetaFrontend, puertoBackend) {
             } else {
                 echo "Reiniciando servicio ${servicioBackend} ..."
                 powershell "& '${nssmPath}' stop '${servicioBackend}'"
-                // Espera más segura hasta que realmente se detenga
+
                 powershell """
-                    while ((Get-Service -Name '${servicioBackend}').Status -eq 'Running') { Start-Sleep -Seconds 2 }
+                    while ((Get-Service -Name '${servicioBackend}').Status -eq 'Running') {
+                        Start-Sleep -Seconds 2
+                    }
                 """
             }
 
             powershell "& '${nssmPath}' start '${servicioBackend}'"
+
+            powershell """
+                \$maxWait = 30
+                \$count = 0
+                do {
+                    Start-Sleep -Seconds 2
+                    \$status = (Get-Service -Name '${servicioBackend}').Status
+                    Write-Output "Estado actual de ${servicioBackend}: \$status"
+                    \$count++
+                } while (\$status -ne 'Running' -and \$count -lt \$maxWait)
+
+                if (\$status -ne 'Running') {
+                    Write-Error "El servicio ${servicioBackend} no llegó a estado 'Running' después de \$maxWait*2 segundos"
+                    exit 1
+                }
+            """
+
             echo "Servicio ${servicioBackend} iniciado en puerto ${puertoBackend}"
         }
+
 
 
         stage("Compilar Frontend ${branch}") {
