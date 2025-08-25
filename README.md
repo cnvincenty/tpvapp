@@ -6,8 +6,7 @@
 - **Base de datos**: MySQL
 
 ---
-
-## Grupo 2
+### Grupo 2
 
 - Ing. Joaquin Gonzales Mosquera
 - Ing. Edson Mancilla Rodriguez
@@ -29,6 +28,12 @@ frontend/ # Frontend Angular 20
 ├── angular.json
 └── package.json
 ```
+
+## Ramas del proyecto
+- main (Principal)
+- prueba (Pruebas del Sistema)
+- preproduccion (Aplicacion con datos casi reales para liberar al publico)
+- produccion (Desplegado en el entorno de producción real)
 
 ---
 
@@ -67,7 +72,9 @@ Base: tpvapp
 Editar backend/src/main/resources/application.properties:
 
 ```
-server.port=9595
+server.port=9595 (prueba)
+server.port=9696 (preproduccion)
+server.port=9797 (produccion)
 
 spring.datasource.hikari.driver-class-name=com.mysql.cj.jdbc.Driver
 spring.datasource.url=jdbc:mysql://localhost:3306/tpvapp?createDatabaseIfNotExist=true
@@ -82,7 +89,9 @@ En frontend/src/environments/environment.prod.ts:
 ```
 export const environment = {
   production: true,
-  apiUrl: 'http://<backend-host>:9595'
+  apiUrl: 'http://<backend-host>:9595' (prueba)
+  apiUrl: 'http://<backend-host>:9696' (preproduccion)
+  apiUrl: 'http://<backend-host>:9797' (produccion)
 };
 ```
 
