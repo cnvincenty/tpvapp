@@ -54,7 +54,9 @@ pipeline {
 def despliegueApp(branch, servicioBackend, carpetaFrontend, puertoBackend) {
     echo "=== Iniciando despliegue para ${branch} ==="
 
-    dir("${env.WORKSPACE}") {
+    def branchDir = "${env.WORKSPACE}\\${branch}"
+
+    dir(branchDir) {
         stage("Checkout ${branch}") {
             git(url: 'https://github.com/cnvincenty/tpvapp.git', branch: branch)
         }
@@ -66,7 +68,7 @@ def despliegueApp(branch, servicioBackend, carpetaFrontend, puertoBackend) {
         }
 
         stage("Construir Backend ${branch}") {
-            def targetDir = "${env.WORKSPACE}\\${env.BACKEND_DIR}\\target"
+            def targetDir = "${branchDir}\\${env.BACKEND_DIR}\\target"
             def jarFile = powershell(
                 script: "Get-ChildItem -Path '${targetDir}' -Filter '*.jar' | Where-Object { \$_.Name -notlike '*.original*' } | Select-Object -First 1 -ExpandProperty Name",
                 returnStdout: true
@@ -133,7 +135,7 @@ def despliegueApp(branch, servicioBackend, carpetaFrontend, puertoBackend) {
         }
 
         stage("Despliegue Frontend ${branch}") {
-            def command = "Copy-Item -Path ${WORKSPACE}\\frontend\\dist\\partevisual\\browser\\* -Destination C:\\nginx\\html\\${carpetaFrontend}\\ -Recurse -Force"
+            def command = "Copy-Item -Path ${branchDir}\\frontend\\dist\\partevisual\\browser\\* -Destination C:\\nginx\\html\\${carpetaFrontend}\\ -Recurse -Force"
             powershell(returnStdout:true, script:command)
         }
 
