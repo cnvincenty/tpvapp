@@ -62,7 +62,7 @@ def despliegueApp(branch, servicioBackend, carpetaFrontend, puertoBackend) {
         }
 
         stage("Compilar Backend ${branch}") {
-            dir("${env.BACKEND_DIR}") {
+            dir("${branchDir}\\${env.BACKEND_DIR}") {
                 powershell 'mvn clean install -DskipTests'
             }
         }
@@ -112,13 +112,13 @@ def despliegueApp(branch, servicioBackend, carpetaFrontend, puertoBackend) {
         }
 
         stage("Compilar Frontend ${branch}") {
-            dir("${env.FRONTEND_DIR}") {
+            dir("${branchDir}\\frontend") {
                 powershell 'npm install'
             }
         }
 
         stage("Construir Frontend ${branch}") {
-            dir("${env.FRONTEND_DIR}") {
+            dir("${branchDir}\\frontend") {
                 powershell 'npm run build'
             }
         }
