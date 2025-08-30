@@ -14,16 +14,31 @@ pipeline {
     }
 
     stages {
-        stage('Despliegues en paralelo') {
+        stage('Compilaciones en paralelo') {
             parallel {
                 stage('Prueba') {
-                    steps { script { despliegueApp("prueba", "tpv-backend-prueba", "tpvprueba", "9595") } }
+                    steps { script { buildApp("prueba", "tpv-backend-prueba", "tpvprueba") } }
                 }
                 stage('Preproduccion') {
-                    steps { script { despliegueApp("preproduccion", "tpv-backend-preproduccion", "tpvapppre", "9696") } }
+                    steps { script { buildApp("preproduccion", "tpv-backend-preproduccion", "tpvapppre") } }
                 }
                 stage('Produccion') {
-                    steps { script { despliegueApp("produccion", "tpv-backend-produccion", "tpvapp", "9797") } }
+                    steps { script { buildApp("produccion", "tpv-backend-produccion", "tpvapp") } }
+                }
+            }
+        }
+
+        stage('Despliegues secuenciales') {
+            steps {
+                script {
+                    gestionarServicioBackend("tpv-backend-prueba", "9595")
+                    desplegarFrontend("${env.WORKSPACE}\\prueba", "tpvprueba")
+
+                    gestionarServicioBackend("tpv-backend-preproduccion", "9696")
+                    desplegarFrontend("${env.WORKSPACE}\\preproduccion", "tpvapppre")
+
+                    gestionarServicioBackend("tpv-backend-produccion", "9797")
+                    desplegarFrontend("${env.WORKSPACE}\\produccion", "tpvapp")
                 }
             }
         }
@@ -31,7 +46,7 @@ pipeline {
 
     post {
         always {
-            echo 'Proceso de despliegue completado (paralelo).'
+            echo 'Pipeline completado.'
         }
         failure {
             echo 'El despliegue falló, revisa los logs para más detalles.'
@@ -39,9 +54,10 @@ pipeline {
     }
 }
 
-def despliegueApp(branch, servicioBackend, carpetaFrontend, puertoBackend) {
-    echo "=== Iniciando despliegue para ${branch} ==="
+/* ---------- FUNCIONES ---------- */
 
+def buildApp(branch, servicioBackend, carpetaFrontend) {
+    echo "=== Iniciando compilación para ${branch} ==="
     def branchDir = "${env.WORKSPACE}\\${branch}"
 
     dir(branchDir) {
@@ -60,7 +76,6 @@ def despliegueApp(branch, servicioBackend, carpetaFrontend, puertoBackend) {
                     construirBackend(branchDir, servicioBackend)
                 }
             )
-            gestionarServicioBackend(servicioBackend, puertoBackend)
         }
 
         stage("Frontend ${branch}") {
@@ -76,11 +91,10 @@ def despliegueApp(branch, servicioBackend, carpetaFrontend, puertoBackend) {
                     }
                 }
             )
-            desplegarFrontend(branchDir, carpetaFrontend)
         }
     }
 
-    echo "=== Despliegue ${branch} completado ==="
+    echo "=== Compilación ${branch} completada ==="
 }
 
 /* ---------- FUNCIONES AUXILIARES ---------- */
@@ -103,7 +117,7 @@ def construirBackend(branchDir, servicioBackend) {
         if (-not (Test-Path '${despliegueDir}')) { New-Item -ItemType Directory -Path '${despliegueDir}' | Out-Null }
         Copy-Item -Path '${jarPath}' -Destination '${despliegueDir}\\app.jar' -Force
     """
-    echo "Backend desplegado en ${despliegueDir}\\app.jar"
+    echo "Backend compilado en ${despliegueDir}\\app.jar"
 }
 
 def gestionarServicioBackend(servicioBackend, puertoBackend) {
